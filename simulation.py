@@ -18,6 +18,7 @@
 
 import random
 import numpy
+import collections
 
 
 class Customer:
@@ -25,17 +26,41 @@ class Customer:
     Customer class
     """
 
-    def __init__(self, arrival_time, customer_number):
-        self.arrival_time = numpy.random.exponential(scale=1.0, size=None)
+    def __init__(self, current_time, customer_number):
+        self.arrival_time = numpy.random.exponential(
+            scale=1.0, size=None) + current_time
         self.order_value = random.randint(200, 100)
         self.customer_number = customer_number
         self.leave_queue = random.randint(900, 2400)
+        self.pay_time = int(random.random() * 140)
+        self.order = Order()
 
 
 class Order:
-    def __init__(self):
-        self.preapere_time
-        self.customer_number
+    def __init__(self, customer_number):
+        self.preapere_time = int(random.random() * 120)
+        self.customer_number = customer_number
+
+
+def first_line():
+    print('Code for the first line')
+
+
+def main_loop(duration):
+    customer = 0
+    customer_number = 0
+    queue = collections.deque()
+    for i in range(0, duration):
+        # Code for the first line #############################################
+        if customer is 0:
+            customer_number += 1
+            customer = Customer(i, customer_number)
+            if customer.arrival_time is i:
+                queue.append(customer)
+                print('Adding customer ' +
+                      customer.customer_number + ' to the line')
+                customer = 0
+        #######################################################################
 
 
 def main():
