@@ -17,8 +17,9 @@
 # env.run(until=15)
 
 import random
-import numpy
 import collections
+
+# Delay at kitchen is rand*96
 
 
 class Customer:
@@ -27,23 +28,36 @@ class Customer:
     """
 
     def __init__(self, current_time, customer_number):
-        self.arrival_time = numpy.random.exponential(
-            scale=1.0, size=None) + current_time
-        self.order_value = random.randint(200, 100)
+        self.arrival_time = int(random.expovariate(1) + current_time)
         self.customer_number = customer_number
-        self.leave_queue = random.randint(900, 2400)
-        self.pay_time = int(random.random() * 140)
-        self.order = Order()
+        self.leave_queue = random.randint(10, 50)
+        self.pay_time = int(random.random() * 120)
+        self.order = Order(self.customer_number)
 
 
 class Order:
     def __init__(self, customer_number):
-        self.preapere_time = int(random.random() * 120)
+        self.preapere_time = int(random.random() * 96)
         self.customer_number = customer_number
+        self.order_value = int(random.random() * 1000)
 
 
 def first_line():
     print('Code for the first line')
+
+
+def is_sitting_clear(sitting_area):
+    for i in sitting_area:
+        if i is None:
+            return True
+    return False
+
+
+def enter_sitting(sitting_area, customer):
+    for i in sitting_area:
+        if i is None:
+            sitting_area[sitting_area.index(i)] = customer
+            break
 
 
 def main_loop(duration):
@@ -51,26 +65,42 @@ def main_loop(duration):
     customer_number = 0
     queue = collections.deque()
     paying_queue = collections.deque(maxlen=1)
+    paying_queue.clear()
     paying_customer = 0
+    kitchen = list()
+    sitting_area = [None for _ in range(10)]
     for i in range(0, duration):
         # Code for the first line #############################################
-        if customer is 0:
+        if customer == 0:
             customer_number += 1
             customer = Customer(i, customer_number)
-            if customer.arrival_time is i:
+            print("Customer " + str(customer.customer_number) +
+                  " will arrive at " + str(customer.arrival_time))
+        if customer != 0:
+            if customer.arrival_time == i:
                 queue.append(customer)
                 print('Adding customer ' +
-                      customer.customer_number + ' to the line')
+                      str(customer.customer_number) + ' to the line')
                 customer = 0
-        if len(paying_queue) is 0:  # no customer is paying
-            paying_customer = queue.popleft()
-            paying_customer.pay_time += i
-            paying_queue.append(paying_customer)
+                print(customer)
+        if len(paying_queue) == 0:  # no customer is paying
+            if len(queue) != 0:
+                paying_customer = queue.popleft()
+                paying_customer.pay_time += i
+                paying_queue.append(paying_customer)
         else:
-            if paying_customer.pay_time is i:
+            if paying_customer.pay_time == i:
                 # Move customer to the waiting for food queue.
-                print("Customer " + paying_customer.customer_number +
-                      " is moved to waiting queue")
+                print("Customer " + str(paying_customer.customer_number) +
+                      " is finished paying")
+                paying_customer.order.preapere_time += i
+                kitchen.append(paying_customer.order)
+                if(is_sitting_clear(sitting_area)):
+                    print("Customer " + str(paying_customer.customer_number) +
+                          " is going to wait for food")
+                    paying_queue.clear()
+                    enter_sitting(sitting_area, customer)
+
                 ###############################################################
 
 
@@ -92,12 +122,16 @@ def main():
         if duration >= 0 and duration <= 4:
             break
 
+    duration *= 3600
+    print(duration)
     if choice == 1:
         print("--------------Morning simulation---------------")
     elif choice == 2:
         print("---------------Noon simulation-----------------")
     else:
         print("--------------Evening simulation---------------")
+
+    main_loop(duration)
 
 
 main()
