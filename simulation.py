@@ -28,7 +28,7 @@ class Customer:
     """
 
     def __init__(self, current_time, customer_number):
-        self.arrival_time = int(random.expovariate(1) + current_time)
+        self.arrival_time = int(random.expovariate(0.01) + current_time)
         self.customer_number = customer_number
         self.leave_queue = random.randint(10, 50)
         self.pay_time = int(random.random() * 120)
