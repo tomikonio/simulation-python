@@ -82,7 +82,6 @@ def main_loop(duration):
                 print('Adding customer ' +
                       str(customer.customer_number) + ' to the line')
                 customer = 0
-                print(customer)
         if len(paying_queue) == 0:  # no customer is paying
             if len(queue) != 0:
                 paying_customer = queue.popleft()
