@@ -50,6 +50,8 @@ def main_loop(duration):
     customer = 0
     customer_number = 0
     queue = collections.deque()
+    paying_queue = collections.deque(maxlen=1)
+    paying_customer = 0
     for i in range(0, duration):
         # Code for the first line #############################################
         if customer is 0:
@@ -60,7 +62,16 @@ def main_loop(duration):
                 print('Adding customer ' +
                       customer.customer_number + ' to the line')
                 customer = 0
-        #######################################################################
+        if len(paying_queue) is 0:  # no customer is paying
+            paying_customer = queue.popleft()
+            paying_customer.pay_time += i
+            paying_queue.append(paying_customer)
+        else:
+            if paying_customer.pay_time is i:
+                # Move customer to the waiting for food queue.
+                print("Customer " + paying_customer.customer_number +
+                      " is moved to waiting queue")
+                ###############################################################
 
 
 def main():
