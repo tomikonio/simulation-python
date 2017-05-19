@@ -32,6 +32,7 @@ class Customer:
         self.customer_number = customer_number
         self.leave_queue = random.randint(10, 50)
         self.pay_time = int(random.random() * 120)
+        self.take_time = int(random.random() * 120)
         self.order = Order(self.customer_number)
 
 
@@ -47,6 +48,9 @@ def first_line():
 
 
 def is_sitting_clear(sitting_area):
+    """
+    Check if there is room in the sitting area
+    """
     for i in sitting_area:
         if i is None:
             return True
@@ -54,11 +58,36 @@ def is_sitting_clear(sitting_area):
 
 
 def enter_sitting(sitting_area, customer):
+    """
+    Move the customer into the sitting area
+    """
     for i in sitting_area:
         if i is None:
             sitting_area[sitting_area.index(i)] = customer
             break
 
+def is_reception_clear(reception_desk):
+    if reception_desk[0] == None:
+        return True
+    else:
+        return False
+
+
+def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
+    # A copy of the kitchen list, in order to be able to modify the original
+    # kitchen during the loop
+    for order in list(kitchen):
+        if order.preapere_time == i:
+            finished_orders.append(order)
+            kitchen.remove(order)
+    if is_reception_clear(reception_desk):    # Check if the reception desk is clear
+        # Now call a customer to take an order
+        for customer in list(sitting_area):
+            for order in list(finished_orders):
+                if order.customer_number == customer.customer_number:
+                    kitchen[kitchen.index(customer)] = None
+                    customer.take_time+=i
+                    reception_desk.append(customer)
 
 def main_loop(duration):
     customer = 0
@@ -69,6 +98,7 @@ def main_loop(duration):
     paying_customer = 0
     kitchen = list()    # The orders
     sitting_area = [None for _ in range(10)]    # The second line
+    finished_orders = list()
     for i in range(0, duration):
         # Code for the first line #############################################
         if customer == 0:
@@ -92,7 +122,10 @@ def main_loop(duration):
             if len(queue) != 0:
                 paying_customer = queue.popleft()
                 paying_customer.pay_time += i
+                # The first customer in line if going to start paying
                 paying_queue.append(paying_customer)
+                print("{}: Customer {} is starting to pay".format(
+                    i, paying_customer.customer_number))
         else:
             if paying_customer.pay_time == i:
                 # Move customer to the waiting for food queue.
@@ -105,8 +138,20 @@ def main_loop(duration):
                         i, paying_customer.customer_number))
                     paying_queue.clear()
                     enter_sitting(sitting_area, customer)
-
+                else:
+                    print("{}: There is no room in the sitting area!".format(i))
+                    print("Customer {} will wait at the counter until there is room".format(
+                        paying_customer.customer_number))
+            elif paying_customer.pay_time > i:
+                if(is_sitting_clear(sitting_area)):
+                    print("{}: Customer {} is going to wait for food".format(
+                        i, paying_customer.customer_number))
+                    paying_queue.clear()
+                    enter_sitting(sitting_area, customer)
                 ###############################################################
+        """
+        Code for The second queueu
+        """
 
 
 def main():
