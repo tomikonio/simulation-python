@@ -28,7 +28,7 @@ class Customer:
     """
 
     def __init__(self, current_time, customer_number):
-        self.arrival_time = int(random.expovariate(0.01) + current_time)
+        self.arrival_time = int(random.expovariate(0.01) + current_time) + 1
         self.customer_number = customer_number
         self.leave_queue = random.randint(10, 50)
         self.pay_time = int(random.random() * 120)
@@ -66,6 +66,7 @@ def enter_sitting(sitting_area, customer):
             sitting_area[sitting_area.index(i)] = customer
             break
 
+
 def is_reception_clear(reception_desk):
     if reception_desk[0] == None:
         return True
@@ -77,17 +78,27 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
     # A copy of the kitchen list, in order to be able to modify the original
     # kitchen during the loop
     for order in list(kitchen):
-        if order.preapere_time == i:
+        if order.preapere_time <= i:
             finished_orders.append(order)
             kitchen.remove(order)
-    if is_reception_clear(reception_desk):    # Check if the reception desk is clear
+    # Check if the reception desk is clear
+    if is_reception_clear(reception_desk):
         # Now call a customer to take an order
         for customer in list(sitting_area):
             for order in list(finished_orders):
-                if order.customer_number == customer.customer_number:
-                    kitchen[kitchen.index(customer)] = None
-                    customer.take_time+=i
-                    reception_desk.append(customer)
+                if customer is not None:
+                    if order.customer_number == customer.customer_number:
+                        finished_orders.remove(order)
+                        customer.take_time += i
+                        reception_desk[0] = customer
+                        sitting_area[sitting_area.index(customer)] = None
+    else:
+        if reception_desk[0].take_time == i:
+            customer = reception_desk[0]
+            reception_desk[0] = None
+            print("{} Customer {} has received food and left the restaurant".format(
+                i, customer.customer_number))
+
 
 def main_loop(duration):
     customer = 0
@@ -99,6 +110,7 @@ def main_loop(duration):
     kitchen = list()    # The orders
     sitting_area = [None for _ in range(10)]    # The second line
     finished_orders = list()
+    reception_desk = [None]
     for i in range(0, duration):
         # Code for the first line #############################################
         if customer == 0:
@@ -134,24 +146,27 @@ def main_loop(duration):
                 paying_customer.order.preapere_time += i
                 kitchen.append(paying_customer.order)
                 if(is_sitting_clear(sitting_area)):
-                    print("{}: Customer {} is going to wait for food".format(
-                        i, paying_customer.customer_number))
+                    print("{}: Customer {} is going to wait for food, his food will be rady in {}".format(
+                        i, paying_customer.customer_number,paying_customer.order.preapere_time))
                     paying_queue.clear()
-                    enter_sitting(sitting_area, customer)
+                    enter_sitting(sitting_area, paying_customer)
                 else:
                     print("{}: There is no room in the sitting area!".format(i))
                     print("Customer {} will wait at the counter until there is room".format(
                         paying_customer.customer_number))
-            elif paying_customer.pay_time > i:
-                if(is_sitting_clear(sitting_area)):
-                    print("{}: Customer {} is going to wait for food".format(
-                        i, paying_customer.customer_number))
-                    paying_queue.clear()
-                    enter_sitting(sitting_area, customer)
+            # elif paying_customer.pay_time > i:
+            #     if(is_sitting_clear(sitting_area)):
+            #         print("{}: Customer {} is going to wait for food".format(
+            #             i, paying_customer.customer_number))
+            #         paying_queue.clear()
+            #         enter_sitting(sitting_area, customer)
                 ###############################################################
         """
         Code for The second queueu
         """
+        sitting_queue(sitting_area, kitchen, i,
+                     finished_orders, reception_desk)
+        
 
 
 def main():
