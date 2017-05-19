@@ -63,12 +63,12 @@ def enter_sitting(sitting_area, customer):
 def main_loop(duration):
     customer = 0
     customer_number = 0
-    queue = collections.deque()
+    queue = collections.deque()  # The first line
     paying_queue = collections.deque(maxlen=1)
     paying_queue.clear()
     paying_customer = 0
-    kitchen = list()
-    sitting_area = [None for _ in range(10)]
+    kitchen = list()    # The orders
+    sitting_area = [None for _ in range(10)]    # The second line
     for i in range(0, duration):
         # Code for the first line #############################################
         if customer == 0:
@@ -78,10 +78,16 @@ def main_loop(duration):
                 i, customer.customer_number, customer.arrival_time))
         else:
             if customer.arrival_time == i:
-                queue.append(customer)
-                print("{}: Adding customer {} to the line".format(
-                    i, customer.customer_number))
-                customer = 0
+                # the queue is too long for that customer, he decided to leave
+                if customer.leave_queue <= len(queue):
+                    print("{}: Customer {} has decided to leave the restaurant because the queue is too long".format(
+                        i, customer.customer_number))
+                    customer = 0
+                else:
+                    queue.append(customer)
+                    print("{}: Adding customer {} to the line".format(
+                        i, customer.customer_number))
+                    customer = 0
         if len(paying_queue) == 0:  # no customer is paying
             if len(queue) != 0:
                 paying_customer = queue.popleft()
