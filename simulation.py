@@ -74,13 +74,13 @@ def main_loop(duration):
         if customer == 0:
             customer_number += 1
             customer = Customer(i, customer_number)
-            print("Customer " + str(customer.customer_number) +
-                  " will arrive at " + str(customer.arrival_time))
-        if customer != 0:
+            print("{}: Customer {} will arrive at {}".format(
+                i, customer.customer_number, customer.arrival_time))
+        else:
             if customer.arrival_time == i:
                 queue.append(customer)
-                print('Adding customer ' +
-                      str(customer.customer_number) + ' to the line')
+                print("{}: Adding customer {} to the line".format(
+                    i, customer.customer_number))
                 customer = 0
         if len(paying_queue) == 0:  # no customer is paying
             if len(queue) != 0:
@@ -90,13 +90,13 @@ def main_loop(duration):
         else:
             if paying_customer.pay_time == i:
                 # Move customer to the waiting for food queue.
-                print("Customer " + str(paying_customer.customer_number) +
-                      " is finished paying")
+                print("{}: Customer {} is finished paying".format(
+                    i, paying_customer.customer_number))
                 paying_customer.order.preapere_time += i
                 kitchen.append(paying_customer.order)
                 if(is_sitting_clear(sitting_area)):
-                    print("Customer " + str(paying_customer.customer_number) +
-                          " is going to wait for food")
+                    print("{}: Customer {} is going to wait for food".format(
+                        i, paying_customer.customer_number))
                     paying_queue.clear()
                     enter_sitting(sitting_area, customer)
 
