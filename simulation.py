@@ -85,8 +85,8 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
     if is_reception_clear(reception_desk):
         # Now call a customer to take an order
         find = False
-        for customer in list(sitting_area):
-            for order in list(finished_orders):
+        for order in list(finished_orders):
+            for customer in list(sitting_area):
                 if customer is not None:
                     if order.customer_number == customer.customer_number:
                         #finished_orders.remove(order)
@@ -133,7 +133,7 @@ def main_loop(duration):
                     customer = 0
                 else:
                     queue.append(customer)
-                    print("{}: Adding customer {} to the line".format(
+                    print("{}: Customer {} has arrived, he is now standing in the line to order".format(
                         i, customer.customer_number))
                     customer = 0
         if len(paying_queue) == 0:  # no customer is paying
@@ -152,7 +152,7 @@ def main_loop(duration):
                 paying_customer.order.preapere_time += i
                 kitchen.append(paying_customer.order)
                 if is_sitting_clear(sitting_area):
-                    print("{}: Customer {} is going to wait for food, his food will be rady in {}".format(
+                    print("{}: Customer {} is going to wait for food, his food will be ready in {}".format(
                         i, paying_customer.customer_number,paying_customer.order.preapere_time))
                     paying_queue.clear()
                     enter_sitting(sitting_area, paying_customer)
@@ -160,6 +160,17 @@ def main_loop(duration):
                     print("{}: There is no room in the sitting area!".format(i))
                     print("Customer {} will wait at the counter until there is room".format(
                         paying_customer.customer_number))
+            elif paying_customer.pay_time < i:
+                if is_sitting_clear(sitting_area):
+                    print("{}: Customer {} is going to wait for food, his food will be rady in {}".format(
+                        i, paying_customer.customer_number, paying_customer.order.preapere_time))
+                    paying_queue.clear()
+                    enter_sitting(sitting_area,paying_customer)
+                else:
+                    print("{}: There is no room in the sitting area!".format(i))
+                    print("Customer {} will wait at the counter until there is room".format(
+                        paying_customer.customer_number))
+
             # elif paying_customer.pay_time > i:
             #     if(is_sitting_clear(sitting_area)):
             #         print("{}: Customer {} is going to wait for food".format(
