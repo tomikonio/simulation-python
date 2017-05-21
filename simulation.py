@@ -88,12 +88,14 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
             for order in list(finished_orders):
                 if customer is not None:
                     if order.customer_number == customer.customer_number:
-                        finished_orders.remove(order)
+                        #finished_orders.remove(order)
                         customer.take_time += i
                         reception_desk[0] = customer
+                        print("The customer {} is now at the food reception desk".format(customer.customer_number))
                         sitting_area[sitting_area.index(customer)] = None
+                        break
     else:
-        if reception_desk[0].take_time == i:
+        if reception_desk[0].take_time <= i:
             customer = reception_desk[0]
             reception_desk[0] = None
             print("{} Customer {} has received food and left the restaurant".format(
