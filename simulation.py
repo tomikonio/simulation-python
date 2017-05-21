@@ -68,7 +68,7 @@ def enter_sitting(sitting_area, customer):
 
 
 def is_reception_clear(reception_desk):
-    if reception_desk[0] == None:
+    if reception_desk[0] is None:
         return True
     else:
         return False
@@ -84,6 +84,7 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
     # Check if the reception desk is clear
     if is_reception_clear(reception_desk):
         # Now call a customer to take an order
+        find = False
         for customer in list(sitting_area):
             for order in list(finished_orders):
                 if customer is not None:
@@ -93,7 +94,10 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
                         reception_desk[0] = customer
                         print("The customer {} is now at the food reception desk".format(customer.customer_number))
                         sitting_area[sitting_area.index(customer)] = None
+                        find = True
                         break
+            if find:
+                break
     else:
         if reception_desk[0].take_time <= i:
             customer = reception_desk[0]
@@ -147,7 +151,7 @@ def main_loop(duration):
                     i, paying_customer.customer_number))
                 paying_customer.order.preapere_time += i
                 kitchen.append(paying_customer.order)
-                if(is_sitting_clear(sitting_area)):
+                if is_sitting_clear(sitting_area):
                     print("{}: Customer {} is going to wait for food, his food will be rady in {}".format(
                         i, paying_customer.customer_number,paying_customer.order.preapere_time))
                     paying_queue.clear()
@@ -168,7 +172,7 @@ def main_loop(duration):
         """
         sitting_queue(sitting_area, kitchen, i,
                      finished_orders, reception_desk)
-        
+
 
 
 def main():
