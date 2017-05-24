@@ -28,7 +28,7 @@ class Customer:
     """
 
     def __init__(self, current_time, customer_number):
-        self.arrival_time = int(random.expovariate(0.01) + current_time) + 1
+        self.arrival_time = int(random.expovariate(0.02) + current_time) + 1
         self.customer_number = customer_number
         self.leave_queue = random.randint(10, 50)
         self.pay_time = int(random.random() * 120)
@@ -41,6 +41,8 @@ class Order:
         self.preapere_time = int(random.random() * 96)
         self.customer_number = customer_number
         self.order_value = int(random.random() * 1000)
+        self.delay_at_desk = random.randint(1, 10)
+        self.ready_to_cook = False
 
 
 def first_line():
@@ -78,7 +80,10 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
     # A copy of the kitchen list, in order to be able to modify the original
     # kitchen during the loop
     for order in list(kitchen):
-        if order.preapere_time <= i:
+        if order.delay_at_desk == i:
+            order.preapere_time += i
+            order.ready_to_cook = True
+        if order.preapere_time <= i and order.ready_to_cook:
             finished_orders.append(order)
             kitchen.remove(order)
     # Check if the reception desk is clear
@@ -156,11 +161,11 @@ def main_loop(duration):
                 # Move customer to the waiting for food queue.
                 print("{}: Customer {} is finished paying".format(
                     i, paying_customer.customer_number))
-                paying_customer.order.preapere_time += i
+                paying_customer.order.delay_at_desk += i
                 kitchen.append(paying_customer.order)
                 if is_sitting_clear(sitting_area):
-                    print("{}: Customer {} is going to wait for food, his food will be ready in {}".format(
-                        i, paying_customer.customer_number, paying_customer.order.preapere_time))
+                    print("{}: Customer {} is going to wait for food".format(
+                        i, paying_customer.customer_number))
                     paying_queue.clear()
                     enter_sitting(sitting_area, paying_customer)
                 else:
