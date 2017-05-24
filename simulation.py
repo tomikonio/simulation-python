@@ -89,10 +89,11 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
             for customer in list(sitting_area):
                 if customer is not None:
                     if order.customer_number == customer.customer_number:
-                        #finished_orders.remove(order)
+                        # finished_orders.remove(order)
                         customer.take_time += i
                         reception_desk[0] = customer
-                        print("The customer {} is now at the food reception desk".format(customer.customer_number))
+                        print("The customer {} is now at the food reception desk".format(
+                            customer.customer_number))
                         sitting_area[sitting_area.index(customer)] = None
                         find = True
                         break
@@ -121,6 +122,8 @@ def main_loop(duration):
         # Code for the first line #############################################
         if customer == 0:
             customer_number += 1
+            global total_customers
+            total_customers += 1
             customer = Customer(i, customer_number)
             print("{}: Customer {} will arrive at {}".format(
                 i, customer.customer_number, customer.arrival_time))
@@ -130,11 +133,15 @@ def main_loop(duration):
                 if customer.leave_queue <= len(queue):
                     print("{}: Customer {} has decided to leave the restaurant because the queue is too long".format(
                         i, customer.customer_number))
+                    global total_loss
+                    total_loss += customer.order.order_value
                     customer = 0
                 else:
                     queue.append(customer)
                     print("{}: Customer {} has arrived, he is now standing in the line to order".format(
                         i, customer.customer_number))
+                    global total_gain
+                    total_gain += customer.order.order_value
                     customer = 0
         if len(paying_queue) == 0:  # no customer is paying
             if len(queue) != 0:
@@ -153,7 +160,7 @@ def main_loop(duration):
                 kitchen.append(paying_customer.order)
                 if is_sitting_clear(sitting_area):
                     print("{}: Customer {} is going to wait for food, his food will be ready in {}".format(
-                        i, paying_customer.customer_number,paying_customer.order.preapere_time))
+                        i, paying_customer.customer_number, paying_customer.order.preapere_time))
                     paying_queue.clear()
                     enter_sitting(sitting_area, paying_customer)
                 else:
@@ -165,7 +172,7 @@ def main_loop(duration):
                     print("{}: Customer {} is going to wait for food, his food will be rady in {}".format(
                         i, paying_customer.customer_number, paying_customer.order.preapere_time))
                     paying_queue.clear()
-                    enter_sitting(sitting_area,paying_customer)
+                    enter_sitting(sitting_area, paying_customer)
                 else:
                     print("{}: There is no room in the sitting area!".format(i))
                     print("Customer {} will wait at the counter until there is room".format(
@@ -182,8 +189,7 @@ def main_loop(duration):
         Code for The second queueu
         """
         sitting_queue(sitting_area, kitchen, i,
-                     finished_orders, reception_desk)
-
+                      finished_orders, reception_desk)
 
 
 def main():
@@ -212,8 +218,22 @@ def main():
         print("---------------Noon simulation-----------------")
     else:
         print("--------------Evening simulation---------------")
-
+    global total_duration
+    total_duration = duration / 3600
     main_loop(duration)
 
 
+##########################################################################
+total_customers = 0
+total_duration = 0
+total_gain = 0
+total_loss = 0
+
 main()
+
+
+print("###################################Simulation conculusion###################################")
+print("Total duration: {} hours".format(total_duration))
+print("Total customers: {}".format(total_customers))
+print("Total gain: {} rupees".format(total_gain))
+print("Total loss: {} rupees".format(total_loss))
