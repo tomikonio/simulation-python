@@ -28,12 +28,18 @@ class Customer:
     """
 
     def __init__(self, current_time, customer_number):
-        self.arrival_time = int(random.expovariate(0.7) + current_time) + 1
+        #self.arrival_time = int(random.expovariate(lamd) + current_time)
+        self.compute_arrival(current_time)
         self.customer_number = customer_number
         self.leave_queue = random.randint(10, 50)
         self.pay_time = int(random.random() * 120)
         self.take_time = int(random.random() * 120)
         self.order = Order(self.customer_number)
+
+    def compute_arrival(self, current_time):
+        self.arrival_time = int(random.expovariate(lamd) + current_time)
+        if(self.arrival_time == current_time):
+            self.arrival_time = current_time + 1
 
 
 class Order:
@@ -75,6 +81,13 @@ def is_reception_clear(reception_desk):
     else:
         return False
 
+def sitting_area_count(sitting_area):
+    count = 0
+    for i in sitting_area:
+        if i is not None:
+            count+=1
+    return count
+
 
 def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
     # A copy of the kitchen list, in order to be able to modify the original
@@ -84,6 +97,8 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
             order.preapere_time += i
             order.ready_to_cook = True
         if order.preapere_time <= i and order.ready_to_cook:
+            global kitchen_efficency
+            kitchen_efficency+=1
             finished_orders.append(order)
             kitchen.remove(order)
     # Check if the reception desk is clear
@@ -124,16 +139,22 @@ def main_loop(duration):
     finished_orders = list()
     reception_desk = [None]
     customers_left_billing_counter = 0
-    satatistics_time = 3600
     for i in range(0, duration):
         # Caclculate statistics
         if i % 20 == 0 and i > 0:
-            satatistics_time+=20
-            if satatistics_time % 3600 == 0:
-                satatistics_time=3600
             global billing_counter_efficiency
-            billing_counter_efficiency = ((billing_counter_efficiency*(i-20)) + (customers_left_billing_counter*20))/i
-            customers_left_billing_counter = 0
+            if customers_left_billing_counter > 0:
+                billing_counter_efficiency = (
+                    (billing_counter_efficiency * (i - 20)) + (customers_left_billing_counter * 20)) / i
+                customers_left_billing_counter = 0
+            global billing_counter_waiting_in_line
+            billing_counter_waiting_in_line = ((billing_counter_waiting_in_line * (i - 20)) + (len(queue) * 20)) / i 
+            global kitchen_waiting_in_line
+            if len(kitchen) > 0:
+                kitchen_waiting_in_line = ((kitchen_waiting_in_line*(i-20))+ (len(kitchen)* 20))/i
+            global order_recieve_counter_waiting_in_line
+            order_recieve_counter_waiting_in_line = ((order_recieve_counter_waiting_in_line*(i-20)) + (sitting_area_count(sitting_area)*20))/i
+            
 
         # Code for the first line #############################################
         if customer == 0:
@@ -179,7 +200,7 @@ def main_loop(duration):
                         i, paying_customer.customer_number))
                     paying_queue.clear()
                     enter_sitting(sitting_area, paying_customer)
-                    customers_left_billing_counter+=1
+                    customers_left_billing_counter += 1
                 else:
                     print("{}: There is no room in the sitting area!".format(i))
                     print("Customer {} will wait at the counter until there is room".format(
@@ -190,7 +211,7 @@ def main_loop(duration):
                         i, paying_customer.customer_number, paying_customer.order.preapere_time))
                     paying_queue.clear()
                     enter_sitting(sitting_area, paying_customer)
-                    customers_left_billing_counter+=1
+                    customers_left_billing_counter += 1
                 else:
                     print("{}: There is no room in the sitting area!".format(i))
                     print("Customer {} will wait at the counter until there is room".format(
@@ -229,27 +250,32 @@ def main():
             break
 
     duration *= 3600
+    global lamd
     print(duration)
     if choice == 1:
         print("--------------Morning simulation---------------")
+        lamd = 0.02
     elif choice == 2:
         print("---------------Noon simulation-----------------")
+        lamd = 0.03
     else:
         print("--------------Evening simulation---------------")
+        lamd = 0.04
     global total_duration
     total_duration = duration / 3600
     main_loop(duration)
 
 
+lamd = 0
 ##########################################################################
 total_customers = 0
 total_duration = 0
 total_gain = 0
 total_loss = 0
 ###########################################
-billing_counter_efficiency = 0.5
-kitchen_efficency = 1.0
-order_recieve_counter_efficiency = 1.0
+billing_counter_efficiency = 0.0
+kitchen_efficency = 0.0
+order_recieve_counter_efficiency = 0.0
 billing_counter_waiting_in_line = 0.0
 kitchen_waiting_in_line = 0.0
 order_recieve_counter_waiting_in_line = 0.0
@@ -264,3 +290,9 @@ print("Total customers: {}".format(total_customers))
 print("Total gain: {} rupees".format(total_gain))
 print("Total loss: {} rupees".format(total_loss))
 print("Billing counter efficency: {}".format(billing_counter_efficiency))
+print("Billing counter waiting in line: {}".format(
+    billing_counter_waiting_in_line))
+print("Kitchen efficency: {}".format(kitchen_efficency/(total_duration)))
+print("Kitchen waiting in line {}".format(kitchen_waiting_in_line))
+print("Order receive counter efficency {}".format(order_recieve_counter_efficiency))
+print("Order receive counter waiting in line: {}".format(order_recieve_counter_waiting_in_line))
