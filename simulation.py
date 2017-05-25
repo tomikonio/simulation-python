@@ -150,7 +150,7 @@ def main_loop(duration):
     paying_queue.clear()
     paying_customer = 0
     kitchen = list()    # The orders
-    sitting_area = [None for _ in range(10)]    # The second line
+    sitting_area = [None for _ in range(5)]    # The second line
     finished_orders = list()
     reception_desk = [None]
     customers_left_billing_counter = 0
