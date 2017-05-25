@@ -44,7 +44,9 @@ class Customer:
 
     def compute_exponent(self,current_time):
         global lamd
-        if current_time % 1500 == 0 and current_time >0:
+        if current_time > 7200 and current_time % 1500 ==0:
+            lamd+=5
+        elif current_time % 1500 == 0 and current_time >0:
             lamd-=5
         arrive = int(random.expovariate(1/lamd) + current_time)
         if arrive == current_time:
