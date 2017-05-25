@@ -279,13 +279,13 @@ def main():
     print(duration)
     if choice == 1:
         print("--------------Morning simulation---------------")
-        lamd = 50
+        lamd = 100
     elif choice == 2:
         print("---------------Noon simulation-----------------")
-        lamd = 30
+        lamd = 80
     else:
         print("--------------Evening simulation---------------")
-        lamd = 20
+        lamd = 50
     global total_duration
     total_duration = duration / 3600
     main_loop(duration)
