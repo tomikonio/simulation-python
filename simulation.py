@@ -48,7 +48,7 @@ class Customer:
             lamd+=5
         elif current_time % 1500 == 0 and current_time >0:
             lamd-=5
-        arrive = int(random.expovariate(1/lamd) + current_time)
+        arrive = int(random.expovariate(1.0/lamd) + current_time)
         if arrive == current_time:
             arrive+=1
         self.arrival_time= arrive
@@ -110,8 +110,8 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
             order.preapere_time += i
             order.ready_to_cook = True
         if order.preapere_time <= i and order.ready_to_cook:
-            global kitchen_efficency
-            kitchen_efficency+=1
+            global kitchen_finished
+            kitchen_finished+=1
             finished_orders.append(order)
             kitchen.remove(order)
     # Check if the reception desk is clear
@@ -136,6 +136,8 @@ def sitting_queue(sitting_area, kitchen, i, finished_orders, reception_desk):
         if reception_desk[0].take_time <= i:
             customer = reception_desk[0]
             reception_desk[0] = None
+            global receive_count
+            receive_count+=1
             print("{} Customer {} has received food and left the restaurant".format(
                 i, customer.customer_number))
 
@@ -161,10 +163,20 @@ def main_loop(duration):
                     (billing_counter_efficiency * (i - 20)) + (customers_left_billing_counter * 20)) / i
                 customers_left_billing_counter = 0
             global billing_counter_waiting_in_line
-            billing_counter_waiting_in_line = ((billing_counter_waiting_in_line * (i - 20)) + (len(queue) * 20)) / i 
+            billing_counter_waiting_in_line = ((billing_counter_waiting_in_line * (i - 20)) + (len(queue) * 20)) / i
+            global kitchen_efficency
+            global kitchen_finished
+            if kitchen_finished >0:
+                kitchen_efficency = ((kitchen_efficency*(i-20)) + (kitchen_finished*20))/i
+                kitchen_finished=0
             global kitchen_waiting_in_line
             if len(kitchen) > 0:
                 kitchen_waiting_in_line = ((kitchen_waiting_in_line*(i-20))+ (len(kitchen)* 20))/i
+            global order_recieve_counter_efficiency
+            global receive_count
+            if receive_count > 0:
+                order_recieve_counter_efficiency = ((order_recieve_counter_efficiency*(i-20)) + (receive_count * 20))/i
+                receive_count=0
             global order_recieve_counter_waiting_in_line
             order_recieve_counter_waiting_in_line = ((order_recieve_counter_waiting_in_line*(i-20)) + (sitting_area_count(sitting_area)*20))/i
             
@@ -293,6 +305,8 @@ billing_counter_waiting_in_line = 0.0
 kitchen_waiting_in_line = 0.0
 order_recieve_counter_waiting_in_line = 0.0
 ###########################################
+receive_count=0
+kitchen_finished = 0
 
 main()
 
@@ -306,6 +320,6 @@ print("Billing counter efficency: {}".format(billing_counter_efficiency))
 print("Billing counter waiting in line: {}".format(
     billing_counter_waiting_in_line))
 print("Kitchen efficency: {}".format(kitchen_efficency/(total_duration)))
-print("Kitchen waiting in line {}".format(kitchen_waiting_in_line))
-print("Order receive counter efficency {}".format(order_recieve_counter_efficiency))
+print("Kitchen waiting in line: {}".format(kitchen_waiting_in_line))
+print("Order receive counter efficency: {}".format(order_recieve_counter_efficiency))
 print("Order receive counter waiting in line: {}".format(order_recieve_counter_waiting_in_line))
