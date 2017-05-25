@@ -32,7 +32,7 @@ class Customer:
         #self.compute_arrival(current_time)
         self.compute_exponent(current_time)
         self.customer_number = customer_number
-        self.leave_queue = random.randint(10, 50)
+        self.leave_queue = random.randint(10, 15)
         self.pay_time = int(random.random() * 120)
         self.take_time = int(random.random() * 120)
         self.order = Order(self.customer_number)
