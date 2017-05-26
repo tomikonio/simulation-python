@@ -30,7 +30,8 @@ class Customer:
     def __init__(self, current_time, customer_number):
         #self.arrival_time = int(random.expovariate(lamd) + current_time)
         #self.compute_arrival(current_time)
-        self.compute_exponent(current_time)
+        #self.compute_exponent(current_time)
+        self.arrival_time = self.compute_gauss(current_time)
         self.customer_number = customer_number
         self.leave_queue = random.randint(5, 8)
         self.pay_time = int(random.random() * 120)
@@ -48,10 +49,17 @@ class Customer:
             lamd+=5
         elif current_time % 1500 == 0 and current_time >0:
             lamd-=5
-        arrive = int(random.expovariate(1.0/lamd) + current_time)
+        arrive = round(random.expovariate(1.0/lamd) + current_time)
         if arrive == current_time:
             arrive+=1
         self.arrival_time= arrive
+
+    def compute_gauss(self,current_time):
+        global lamd
+        arrive = round(random.gauss(lamd,3) + current_time)
+        if arrive == current_time:
+            arrive+=1
+        return arrive
 
 
 
@@ -62,7 +70,6 @@ class Order:
         self.order_value = int(random.random() * 1000)
         self.delay_at_desk = random.randint(1, 10)
         self.ready_to_cook = False
-
 
 def first_line():
     print('Code for the first line')
@@ -279,13 +286,13 @@ def main():
     print(duration)
     if choice == 1:
         print("--------------Morning simulation---------------")
-        lamd = 100
+        lamd = 50
     elif choice == 2:
         print("---------------Noon simulation-----------------")
-        lamd = 80
+        lamd = 40
     else:
         print("--------------Evening simulation---------------")
-        lamd = 50
+        lamd = 20
     global total_duration
     total_duration = duration / 3600
     main_loop(duration)
