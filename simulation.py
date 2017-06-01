@@ -31,7 +31,10 @@ class Customer:
         #self.arrival_time = int(random.expovariate(lamd) + current_time)
         #self.compute_arrival(current_time)
         #self.compute_exponent(current_time)
-        self.arrival_time = self.compute_gauss(current_time)
+        if distribution == 1:
+            self.arrival_time = self.compute_exponent(current_time)
+        else:
+            self.arrival_time = self.compute_gauss(current_time)
         self.customer_number = customer_number
         self.leave_queue = random.randint(5, 8)
         self.pay_time = int(random.random() * 120)
@@ -45,14 +48,10 @@ class Customer:
 
     def compute_exponent(self,current_time):
         global lamd
-        if current_time > 7200 and current_time % 1500 ==0:
-            lamd+=5
-        elif current_time % 1500 == 0 and current_time >0:
-            lamd-=5
         arrive = round(random.expovariate(1.0/lamd) + current_time)
         if arrive == current_time:
             arrive+=1
-        self.arrival_time= arrive
+        return arrive
 
     def compute_gauss(self,current_time):
         global lamd
@@ -281,24 +280,43 @@ def main():
         if duration >= 0 and duration <= 4:
             break
 
+    global distribution
+    while True:
+        print("Please enter the desired distribution of the time between arrivals of customers:")
+        print("1.Exponential distribution")
+        print("2.Gaussian distribution")
+        distribution = int(input())
+        if distribution == 1 or distribution == 2:
+            break
+
     duration *= 3600
     global lamd
     print(duration)
     if choice == 1:
         print("--------------Morning simulation---------------")
-        lamd = 50
+        if distribution == 1:
+            lamd = 100
+        else:
+            lamd = 50
     elif choice == 2:
         print("---------------Noon simulation-----------------")
-        lamd = 40
+        if distribution == 1:
+            lamd = 80
+        else:
+            lamd = 40
     else:
         print("--------------Evening simulation---------------")
-        lamd = 20
+        if distribution == 1:
+            lamd = 50
+        else:
+            lamd = 20
     global total_duration
     total_duration = duration / 3600
     main_loop(duration)
 
 
 lamd = 0
+distribution = 0
 ##########################################################################
 total_customers = 0
 total_duration = 0
@@ -317,9 +335,13 @@ kitchen_finished = 0
 
 main()
 
-
+if distribution == 1:
+    distribution = "Exponential"
+else:
+    distribution = "Gaussian"
 print("###################################Simulation conculusion###################################")
 print("Total duration: {} hours".format(total_duration))
+print("Distribution: {}".format(distribution))
 print("Total customers: {}".format(total_customers))
 print("Total gain: {} rupees".format(total_gain))
 print("Total loss: {} rupees".format(total_loss))
