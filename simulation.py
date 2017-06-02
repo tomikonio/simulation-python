@@ -291,6 +291,7 @@ def main():
 
     duration *= 3600
     global lamd
+    global choice_string
     print(duration)
     if choice == 1:
         print("--------------Morning simulation---------------")
@@ -298,18 +299,21 @@ def main():
             lamd = 100
         else:
             lamd = 50
+        choice_string = "Morning"
     elif choice == 2:
         print("---------------Noon simulation-----------------")
         if distribution == 1:
             lamd = 80
         else:
             lamd = 40
+        choice_string = "Noon"
     else:
         print("--------------Evening simulation---------------")
         if distribution == 1:
             lamd = 50
         else:
             lamd = 20
+        choice_string = "Evening"
     global total_duration
     total_duration = duration / 3600
     main_loop(duration)
@@ -317,6 +321,7 @@ def main():
 
 lamd = 0
 distribution = 0
+choice_string = 0
 ##########################################################################
 total_customers = 0
 total_duration = 0
@@ -341,6 +346,7 @@ else:
     distribution = "Gaussian"
 print("###################################Simulation conculusion###################################")
 print("Total duration: {} hours".format(total_duration))
+print("Time of day: {}".format(choice_string))
 print("Distribution: {}".format(distribution))
 print("Total customers: {}".format(total_customers))
 print("Total gain: {} rupees".format(total_gain))
